@@ -5,18 +5,26 @@ import tensorflow as tf
 import joblib
 import pandas as pd
 import difflib
+import os
 
 # Configuración de la API de OpenAI
-OPENAI_API_KEY = ""  # Reemplázala con tu clave real
+OPENAI_API_KEY = ""  # Agrega tu clave aquí
 openai.api_key = OPENAI_API_KEY
 
-# Cargar el modelo y los datos solo si no están en la sesión
+# Función para cargar estilos
+def cargar_estilos():
+    ruta_estilos = os.path.join("styles", "styles.css")
+    if os.path.exists(ruta_estilos):
+        with open(ruta_estilos, "r", encoding="utf-8") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Cargar modelo y dataset si no están en session_state
 if "model_loaded" not in st.session_state:
     with st.spinner("Cargando modelo..."):
         model = tf.keras.models.load_model("models/disease_nn_model.h5")
         mlb = joblib.load("datasets/label_binarizer.pkl")
-        df_symptoms = pd.read_csv("datasets/Diseases_Symptoms_Processed.csv")
-        df_treatments = pd.read_csv("datasets/Diseases_Treatments_Processed.csv")
+        df_symptoms = pd.read_csv("datasets/df_Diseases_Symptoms_Processed.csv")
+        df_treatments = pd.read_csv("datasets/df_Diseases_Treatments_Processed.csv")
 
         columnas_excluir = ["code", "name", "treatments"]
         columnas_presentes = [col for col in columnas_excluir if col in df_symptoms.columns]
@@ -30,18 +38,39 @@ if "model_loaded" not in st.session_state:
         st.session_state["mlb"] = mlb
         st.session_state["model"] = model
 
-# Función para corregir síntomas
-def corregir_sintomas(symptoms, available_symptoms):
+# Inicializar session_state para almacenar síntomas corregidos y pendientes
+if "symptoms_corrected" not in st.session_state:
+    st.session_state["symptoms_corrected"] = {}
+
+if "pending_corrections" not in st.session_state:
+    st.session_state["pending_corrections"] = {}
+
+if "disease_predictions" not in st.session_state:
+    st.session_state["disease_predictions"] = None
+
+# Función para sugerir síntomas y manejar términos desconocidos
+def sugerir_sintomas(symptoms, available_symptoms):
     available_symptoms_lower = {s.lower(): s for s in available_symptoms}
-    corrected = []
+    pending = {}
 
     for symptom in symptoms:
         symptom_lower = symptom.lower()
-        closest_match = difflib.get_close_matches(symptom_lower, available_symptoms_lower.keys(), n=1, cutoff=0.5)
-        if closest_match:
-            corrected.append(available_symptoms_lower[closest_match[0]])
 
-    return corrected
+        if symptom_lower in available_symptoms_lower:
+            st.session_state["symptoms_corrected"][symptom_lower] = available_symptoms_lower[symptom_lower]
+        elif symptom_lower in st.session_state["symptoms_corrected"]:
+            continue  
+        else:
+            closest_matches = difflib.get_close_matches(symptom_lower, available_symptoms_lower.keys(), n=3, cutoff=0.4)
+            if closest_matches:
+                pending[symptom_lower] = closest_matches
+            else:
+                st.warning(f"El síntoma '{symptom}' no está registrado y no se encontraron coincidencias.")
+                st.session_state["symptoms_corrected"][symptom_lower] = symptom  
+
+    if pending:
+        st.session_state["pending_corrections"] = pending
+        st.rerun()  # 🔥 Recargar la interfaz inmediatamente para mostrar las sugerencias
 
 # Función para predecir enfermedades
 def predict_diseases(symptom_input):
@@ -74,7 +103,7 @@ def predict_diseases(symptom_input):
             results.append((disease, prob, treatments))
     return results
 
-# Función para interactuar con la API de ChatGPT
+# Función para interactuar con ChatGPT
 def chat_with_gpt(disease_predictions):
     if not disease_predictions:
         return "No se encontraron enfermedades relacionadas con estos síntomas."
@@ -100,105 +129,51 @@ def chat_with_gpt(disease_predictions):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error en la consulta: {str(e)}"
-    
-# Función mejorada para sugerir síntomas solo cuando no hay coincidencia exacta
-def sugerir_sintomas(symptoms, available_symptoms):
-    available_symptoms_lower = {s.lower(): s for s in available_symptoms}
-    corrected = []
 
-    for symptom in symptoms:
-        symptom_lower = symptom.lower()
+# Interfaz de usuario
+titulo_placeholder = st.empty()  # Espacio reservado para el título
+titulo_placeholder.title("Asistente Médico IA con ChatGPT")
+cargar_estilos()
+mensaje_placeholder = st.empty()  # Espacio reservado para evitar duplicación
+mensaje_placeholder.write("Ingresa tus síntomas para obtener un diagnóstico basado en un modelo de IA y una explicación de un chatbot médico.")
 
-        # Si el síntoma ya está en el dataset, se usa directamente
-        if symptom_lower in available_symptoms_lower:
-            corrected.append(available_symptoms_lower[symptom_lower])
-        else:
-            # Buscar síntomas similares
-            closest_matches = difflib.get_close_matches(symptom_lower, available_symptoms_lower.keys(), n=3, cutoff=0.4)
-
-            if closest_matches:
-                # Mostrar opciones al usuario
-                selected_option = st.radio(
-                    f"¿Te referías a '{symptom}'?", 
-                    [available_symptoms_lower[m] for m in closest_matches] + ["Ninguna de las anteriores"], 
-                    index=0
-                )
-                if selected_option != "Ninguna de las anteriores":
-                    corrected.append(selected_option)
-            else:
-                st.warning(f"No se encontraron coincidencias para '{symptom}'.")
-    
-    return corrected
-
-# Inicializar session_state para almacenar síntomas corregidos
-if "symptoms_corrected" not in st.session_state:
-    st.session_state["symptoms_corrected"] = {}
-
-# Función mejorada para sugerir síntomas solo cuando no hay coincidencia exacta
-def sugerir_sintomas(symptoms, available_symptoms):
-    available_symptoms_lower = {s.lower(): s for s in available_symptoms}
-    corrected = []
-
-    for symptom in symptoms:
-        symptom_lower = symptom.lower()
-
-        # Si el síntoma ya está en el dataset, se usa directamente
-        if symptom_lower in available_symptoms_lower:
-            corrected.append(available_symptoms_lower[symptom_lower])
-        else:
-            # Si el usuario ya corrigió este síntoma, usar la opción guardada
-            if symptom_lower in st.session_state["symptoms_corrected"]:
-                corrected_symptom = st.session_state["symptoms_corrected"][symptom_lower]
-                corrected.append(corrected_symptom)
-            else:
-                # Buscar síntomas similares
-                closest_matches = difflib.get_close_matches(symptom_lower, available_symptoms_lower.keys(), n=3, cutoff=0.4)
-
-                if closest_matches:
-                    # Mostrar opciones al usuario
-                    selected_option = st.radio(
-                        f"¿'{symptom}' no es un síntoma registrado, te referias a ...?", 
-                        [available_symptoms_lower[m] for m in closest_matches] + ["Ninguna de las anteriores"], 
-                        index=0,
-                        key=f"radio_{symptom_lower}"  # Clave única para evitar conflictos
-                    )
-
-                    if selected_option != "Ninguna de las anteriores":
-                        corrected.append(selected_option)
-                        st.session_state["symptoms_corrected"][symptom_lower] = selected_option  # Guardar selección del usuario
-                    else:
-                        corrected.append(symptom)  # Mantenerlo sin cambios si no hay corrección
-                else:
-                    st.warning(f"No se encontraron coincidencias para '{symptom}'.")
-                    corrected.append(symptom)  # Mantenerlo sin cambios si no hay sugerencias
-
-    return corrected
-
-# Modificación en la interfaz
-st.title("Asistente Médico IA con ChatGPT")
-st.write("Ingresa tus síntomas para obtener un diagnóstico probable basado en un modelo de IA y una explicación de un chatbot médico.")
-
-# Input de síntomas en minúsculas
+# Input de síntomas
 symptoms_input = st.text_input("Escribe los síntomas separados por comas", key="symptoms_input").lower()
 
-if st.button("Analizar síntomas", key="predict_button"):
+# Si hay correcciones pendientes, mostrar opciones y ocultar botón de análisis
+if st.session_state["pending_corrections"]:
+    st.subheader("Confirma los síntomas corregidos antes de continuar")
+    for symptom, options in st.session_state["pending_corrections"].items():
+        selected_option = st.radio(
+            f"¿'{symptom}' no es un síntoma registrado, te referías a...?",
+            options + ["Ninguna de las anteriores"],
+            index=0,
+            key=f"radio_{symptom}"
+        )
+        st.session_state["symptoms_corrected"][symptom] = selected_option if selected_option != "Ninguna de las anteriores" else symptom
+
+    if st.button("Confirmar selección"):
+        st.session_state["pending_corrections"] = {}  
+        corrected_symptoms = list(st.session_state["symptoms_corrected"].values())
+        st.session_state["disease_predictions"] = predict_diseases(corrected_symptoms)
+        st.rerun()
+
+# Si no hay correcciones pendientes, analizar directamente
+elif st.button("Analizar síntomas", key="predict_button"):
     symptoms = [s.strip() for s in symptoms_input.split(",") if s.strip()]
-    corrected_symptoms = sugerir_sintomas(symptoms, st.session_state["X"].columns)
+    sugerir_sintomas(symptoms, st.session_state["X"].columns)
 
-    if corrected_symptoms:
-        disease_predictions = predict_diseases(corrected_symptoms)
-        chat_response = chat_with_gpt(disease_predictions)
+    if not st.session_state["pending_corrections"]:
+        st.session_state["disease_predictions"] = predict_diseases(symptoms)
+        st.rerun()
 
-        st.subheader("Resultados del Modelo de IA:")
-        if disease_predictions:
-            for enfermedad, probabilidad, *_ in disease_predictions:
-                st.write(f"- {enfermedad}: {probabilidad*100:.2f}% de probabilidad")
-        else:
-            st.write("No se encontraron enfermedades relacionadas.")
+# Mostrar resultados si ya se generaron
+if st.session_state["disease_predictions"]:
+    disease_predictions = st.session_state["disease_predictions"]
+    st.subheader("Resultados del Modelo de IA:")
+    for enfermedad, probabilidad, *_ in disease_predictions:
+        st.write(f"- {enfermedad}: {probabilidad*100:.2f}% de probabilidad")
 
-        st.subheader("Explicación del Chatbot:")
-        st.write(chat_response)
-    else:
-        st.warning("No se introdujeron síntomas válidos.")
-
-
+    st.subheader("Explicación del Chatbot:")
+    chat_response = chat_with_gpt(disease_predictions)
+    st.write(chat_response)
