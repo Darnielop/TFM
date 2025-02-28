@@ -1,0 +1,7 @@
+pandas
+matplotlib.pyplot
+seaborn
+os
+shutil
+zipfile
+re
