@@ -6,10 +6,14 @@ import joblib
 import pandas as pd
 import difflib
 import os
+from googletrans import Translator
+import streamlit as st
+import openai
 
 # Configuración de la API de OpenAI
 OPENAI_API_KEY = ""  # Agrega tu clave aquí
 openai.api_key = OPENAI_API_KEY
+translator = Translator()
 
 # Función para cargar estilos
 def cargar_estilos():
@@ -23,9 +27,9 @@ if "model_loaded" not in st.session_state:
     with st.spinner("Cargando modelo..."):
         model = tf.keras.models.load_model("models/disease_nn_model.h5")
         mlb = joblib.load("datasets/label_binarizer.pkl")
-        df_symptoms = pd.read_csv("datasets/df_Diseases_Symptoms_Processed.csv")
-        df_treatments = pd.read_csv("datasets/df_Diseases_Treatments_Processed.csv")
-
+        df_symptoms = pd.read_csv("datasets/Diseases_Symptoms_Processed.csv")
+        df_treatments = pd.read_csv("datasets/Diseases_Treatments_Processed.csv")
+        
         columnas_excluir = ["code", "name", "treatments"]
         columnas_presentes = [col for col in columnas_excluir if col in df_symptoms.columns]
 
@@ -47,7 +51,55 @@ if "pending_corrections" not in st.session_state:
 
 if "disease_predictions" not in st.session_state:
     st.session_state["disease_predictions"] = None
+    
+    
+    
+def traducir_texto(texto, src="es", dest="en"):
+    """Traduce el texto siempre de español a inglés de manera síncrona."""
+    try:
+        # Traducción síncrona
+        translated = translator.translate(texto, src=src, dest=dest)
+        print(f"📝 Traducido '{texto}' -> '{translated.text}'")  # Muestra la traducción
+        return translated.text  # Accede al texto traducido
+    except Exception as e:
+        print(f"⚠️ Error al traducir: {e}")
+        return texto  # Si hay error, retorna el texto original
 
+def traducir_sintomas(symptoms):
+    """Traduce una lista de síntomas de español a inglés."""
+    translated_symptoms = []
+    for symptom in symptoms:
+        # Llamamos a la función para traducir cada síntoma
+        translated_symptom = traducir_texto(symptom)  # Llamada sincrónica
+        if translated_symptom:  # Asegurarse de que no sea None
+            translated_symptoms.append(translated_symptom)
+    
+    return translated_symptoms  # Devuelve una lista de síntomas traducidos
+
+
+# Función para corregir los síntomas
+def corregir_sintomas(symptoms, available_symptoms):
+    """Traduce y corrige los síntomas según la lista disponible en inglés."""
+    # Traducir los síntomas primero
+    translated_symptoms = traducir_sintomas(symptoms)
+    translated_symptoms = {s.lower(): s for s in translated_symptoms}
+    available_symptoms_lower = {s.lower(): s for s in available_symptoms}  # Diccionario en minúsculas
+    corrected = []
+    
+    if translated_symptoms:
+        for symptom in translated_symptoms:
+            if symptom in available_symptoms_lower:
+                corrected.append(available_symptoms_lower[symptom])  # Recupera el nombre original en inglés
+            else:
+                corrected.append(symptom)
+    else:
+        print(f"⚠️ No se encontraron síntomas traducidos.")
+        
+    print(f"🔍 Síntomas corregidos: {corrected}")
+    return corrected
+
+if "symptoms_corrected" not in st.session_state:
+    st.session_state["symptoms_corrected"] = {}
 # Función para sugerir síntomas y manejar términos desconocidos
 def sugerir_sintomas(symptoms, available_symptoms):
     available_symptoms_lower = {s.lower(): s for s in available_symptoms}
@@ -55,13 +107,15 @@ def sugerir_sintomas(symptoms, available_symptoms):
 
     for symptom in symptoms:
         symptom_lower = symptom.lower()
+        symptom_lower_corrected = corregir_sintomas([symptom], available_symptoms)  # Corregir el síntoma actual
+        print(f"🔍 Corrigiendo '{symptom}' a '{symptom_lower_corrected}'")
 
-        if symptom_lower in available_symptoms_lower:
-            st.session_state["symptoms_corrected"][symptom_lower] = available_symptoms_lower[symptom_lower]
-        elif symptom_lower in st.session_state["symptoms_corrected"]:
+        if symptom_lower_corrected[0] in available_symptoms_lower:
+            st.session_state["symptoms_corrected"][symptom_lower_corrected[0]] = available_symptoms_lower[symptom_lower_corrected[0]]
+        elif symptom_lower_corrected[0] in st.session_state["symptoms_corrected"]:
             continue  
         else:
-            closest_matches = difflib.get_close_matches(symptom_lower, available_symptoms_lower.keys(), n=3, cutoff=0.4)
+            closest_matches = difflib.get_close_matches(symptom_lower_corrected[0], available_symptoms_lower.keys(), n=3, cutoff=0.4)
             if closest_matches:
                 pending[symptom_lower] = closest_matches
             else:
