@@ -11,7 +11,7 @@ import streamlit as st
 import openai
 
 # Configuración de la API de OpenAI
-OPENAI_API_KEY = "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"  # Agrega tu clave aquí
+OPENAI_API_KEY = ""  # Agrega tu clave aquí
 openai.api_key = OPENAI_API_KEY
 translator = Translator()
 
