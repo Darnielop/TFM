@@ -195,7 +195,7 @@ mensaje_placeholder.write("Ingresa tus síntomas para obtener un diagnóstico ba
 symptoms_input = st.text_input("Escribe los síntomas separados por comas", key="symptoms_input").lower()
 
 # Si hay correcciones pendientes, mostrar opciones y ocultar botón de análisis
-if st.session_state["pending_corrections"]:
+if st.session_state.get("pending_corrections", {}):
     st.subheader("Confirma los síntomas corregidos antes de continuar")
     for symptom, options in st.session_state["pending_corrections"].items():
         selected_option = st.radio(
