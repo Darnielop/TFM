@@ -27,8 +27,8 @@ if "model_loaded" not in st.session_state:
     with st.spinner("Cargando modelo..."):
         model = tf.keras.models.load_model("models/disease_nn_model.h5")
         mlb = joblib.load("datasets/label_binarizer.pkl")
-        df_symptoms = pd.read_csv("datasets/Diseases_Symptoms_Processed.csv")
-        df_treatments = pd.read_csv("datasets/Diseases_Treatments_Processed.csv")
+        df_symptoms = pd.read_csv("datasets/df_Diseases_Symptoms_Processed.csv")
+        df_treatments = pd.read_csv("datasets/df_Diseases_Treatments_Processed.csv")
         
         columnas_excluir = ["code", "name", "treatments"]
         columnas_presentes = [col for col in columnas_excluir if col in df_symptoms.columns]
