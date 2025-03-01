@@ -1,3 +1,7 @@
+
+![Asistente Médico IA](styles/logo.png)
+
+
 ## 🏥 Asistente Médico IA con ChatGPT
 
 Este es un asistente médico basado en **IA** que permite a los usuarios ingresar síntomas y obtener un diagnóstico estimado, junto con tratamientos recomendados. Utiliza un **modelo de aprendizaje profundo** para la predicción de enfermedades y una integración con **ChatGPT** para ofrecer explicaciones detalladas.
