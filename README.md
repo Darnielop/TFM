@@ -1,6 +1,12 @@
+<p align="center">
+  <img src="styles/logo.png" alt="Asistente Médico IA" width="400"/>
+</p>
 
-![Asistente Médico IA](styles/logo.png)
+## 👥 Participantes
 
+- **Darío Nievas López**  
+- **Oscar Bermúdez Gallego**  
+- **José Antonio García Antona**  
 
 ## 🏥 Asistente Médico IA con ChatGPT
 
