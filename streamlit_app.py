@@ -7,17 +7,24 @@ import pandas as pd
 import difflib
 import os
 from googletrans import Translator
+
+st.set_page_config(
+    page_title="Diagnosis",
+    page_icon="styles/logo.png"
+)
+
 # Configuración de la API de OpenAI
-OPENAI_API_KEY = "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"  # Agrega tu clave aquí
+OPENAI_API_KEY = ""  # Agrega tu clave aquí
 openai.api_key = OPENAI_API_KEY
 translator = Translator()
 
-# Función para cargar estilos
-def cargar_estilos():
-    ruta_estilos = os.path.join("styles", "styles.css")
-    if os.path.exists(ruta_estilos):
-        with open(ruta_estilos, "r", encoding="utf-8") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# Cargar el archivo CSS
+def load_css(file_name):
+    with open(file_name, "r") as f:
+        css = f.read()
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+load_css("styles/styles.css")
 
 # Cargar modelo y dataset si no están en session_state
 if "model_loaded" not in st.session_state:
@@ -158,7 +165,6 @@ def chat_with_gpt(disease_predictions):
 # Interfaz de usuario
 titulo_placeholder = st.empty()  # Espacio reservado para el título
 titulo_placeholder.title("Asistente Médico IA con ChatGPT")
-cargar_estilos()
 mensaje_placeholder = st.empty()  # Espacio reservado para evitar duplicación
 mensaje_placeholder.write("Ingresa tus síntomas para obtener un diagnóstico basado en un modelo de IA y una explicación de un chatbot médico.")
 
