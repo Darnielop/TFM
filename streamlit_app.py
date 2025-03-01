@@ -7,11 +7,8 @@ import pandas as pd
 import difflib
 import os
 from googletrans import Translator
-import streamlit as st
-import openai
-
 # Configuración de la API de OpenAI
-OPENAI_API_KEY = ""  # Agrega tu clave aquí
+OPENAI_API_KEY = "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"  # Agrega tu clave aquí
 openai.api_key = OPENAI_API_KEY
 translator = Translator()
 
@@ -29,7 +26,7 @@ if "model_loaded" not in st.session_state:
         mlb = joblib.load("datasets/label_binarizer.pkl")
         df_symptoms = pd.read_csv("datasets/df_Diseases_Symptoms_Processed.csv")
         df_treatments = pd.read_csv("datasets/df_Diseases_Treatments_Processed.csv")
-        
+
         columnas_excluir = ["code", "name", "treatments"]
         columnas_presentes = [col for col in columnas_excluir if col in df_symptoms.columns]
 
@@ -51,71 +48,41 @@ if "pending_corrections" not in st.session_state:
 
 if "disease_predictions" not in st.session_state:
     st.session_state["disease_predictions"] = None
-    
-    
-    
+
+
 def traducir_texto(texto, src="es", dest="en"):
     """Traduce el texto siempre de español a inglés de manera síncrona."""
     try:
         # Traducción síncrona
         translated = translator.translate(texto, src=src, dest=dest)
-        print(f"📝 Traducido '{texto}' -> '{translated.text}'")  # Muestra la traducción
+        st.markdown(f"📝 Traducido '{texto}' -> '{translated.text}'")  # Muestra la traducción
         return translated.text  # Accede al texto traducido
     except Exception as e:
-        print(f"⚠️ Error al traducir: {e}")
+        st.markdown(f"⚠️ Error al traducir: {e}")
         return texto  # Si hay error, retorna el texto original
 
-def traducir_sintomas(symptoms):
-    """Traduce una lista de síntomas de español a inglés."""
-    translated_symptoms = []
-    for symptom in symptoms:
-        # Llamamos a la función para traducir cada síntoma
-        translated_symptom = traducir_texto(symptom)  # Llamada sincrónica
-        if translated_symptom:  # Asegurarse de que no sea None
-            translated_symptoms.append(translated_symptom)
-    
-    return translated_symptoms  # Devuelve una lista de síntomas traducidos
-
-
-# Función para corregir los síntomas
-def corregir_sintomas(symptoms, available_symptoms):
-    """Traduce y corrige los síntomas según la lista disponible en inglés."""
-    # Traducir los síntomas primero
-    translated_symptoms = traducir_sintomas(symptoms)
-    translated_symptoms = {s.lower(): s for s in translated_symptoms}
-    available_symptoms_lower = {s.lower(): s for s in available_symptoms}  # Diccionario en minúsculas
-    corrected = []
-    
-    if translated_symptoms:
-        for symptom in translated_symptoms:
-            if symptom in available_symptoms_lower:
-                corrected.append(available_symptoms_lower[symptom])  # Recupera el nombre original en inglés
-            else:
-                corrected.append(symptom)
-    else:
-        print(f"⚠️ No se encontraron síntomas traducidos.")
-        
-    print(f"🔍 Síntomas corregidos: {corrected}")
-    return corrected
-
-if "symptoms_corrected" not in st.session_state:
-    st.session_state["symptoms_corrected"] = {}
 # Función para sugerir síntomas y manejar términos desconocidos
 def sugerir_sintomas(symptoms, available_symptoms):
     available_symptoms_lower = {s.lower(): s for s in available_symptoms}
     pending = {}
+    all_simptoms = []
 
     for symptom in symptoms:
-        symptom_lower = symptom.lower()
-        symptom_lower_corrected = corregir_sintomas([symptom], available_symptoms)  # Corregir el síntoma actual
-        print(f"🔍 Corrigiendo '{symptom}' a '{symptom_lower_corrected}'")
+        st.markdown(f" sintoma {symptom}")
+        symptom_lower = traducir_texto(symptom)  # Pasar el síntoma como cadena, no como listast.write(f"Término traducido: {symptom_lower}")  # Depuración
+        symptom_lower = symptom_lower.lower()
+        st.markdown(f"minuscula:{symptom_lower}")
 
-        if symptom_lower_corrected[0] in available_symptoms_lower:
-            st.session_state["symptoms_corrected"][symptom_lower_corrected[0]] = available_symptoms_lower[symptom_lower_corrected[0]]
-        elif symptom_lower_corrected[0] in st.session_state["symptoms_corrected"]:
+        if symptom_lower in available_symptoms_lower:        
+            st.session_state["symptoms_corrected"][symptom_lower] = available_symptoms_lower[symptom_lower]
+            all_simptoms.append(symptom_lower)
+
+        elif symptom_lower in st.session_state["symptoms_corrected"]:
+
             continue  
+
         else:
-            closest_matches = difflib.get_close_matches(symptom_lower_corrected[0], available_symptoms_lower.keys(), n=3, cutoff=0.4)
+            closest_matches = difflib.get_close_matches(symptom_lower, available_symptoms_lower.keys(), n=3, cutoff=0.4)
             if closest_matches:
                 pending[symptom_lower] = closest_matches
             else:
@@ -125,17 +92,19 @@ def sugerir_sintomas(symptoms, available_symptoms):
     if pending:
         st.session_state["pending_corrections"] = pending
         st.rerun()  # 🔥 Recargar la interfaz inmediatamente para mostrar las sugerencias
+    return all_simptoms
 
 # Función para predecir enfermedades
 def predict_diseases(symptom_input):
     df_treatments = st.session_state["df_treatments"]
-    symptom_input = [symptom.lower() for symptom in symptom_input]
     X = st.session_state["X"]
     mlb = st.session_state["mlb"]
     model = st.session_state["model"]
-
+    st.markdown(f"Antes de vector {symptom_input}")
     symptom_vector = np.array([[1 if symptom in symptom_input else 0 for symptom in X.columns]])
     symptom_vector = symptom_vector[:, :model.input_shape[1]]
+    st.markdown(f"despues de vector {symptom_input}")
+
 
     if symptom_vector.sum() == 0:
         return []
@@ -143,7 +112,7 @@ def predict_diseases(symptom_input):
     probabilities = model.predict(symptom_vector)[0]
     disease_probabilities = {mlb.classes_[i]: prob for i, prob in enumerate(probabilities)}
     sorted_diseases = sorted(disease_probabilities.items(), key=lambda x: x[1], reverse=True)
-
+    st.markdown(f"sorted_diseases: {sorted_diseases}")
     results = []
     for disease, prob in sorted_diseases:
         if prob >= 0.01:
@@ -195,11 +164,11 @@ mensaje_placeholder.write("Ingresa tus síntomas para obtener un diagnóstico ba
 symptoms_input = st.text_input("Escribe los síntomas separados por comas", key="symptoms_input").lower()
 
 # Si hay correcciones pendientes, mostrar opciones y ocultar botón de análisis
-if st.session_state.get("pending_corrections", {}):
+if st.session_state["pending_corrections"]:
     st.subheader("Confirma los síntomas corregidos antes de continuar")
     for symptom, options in st.session_state["pending_corrections"].items():
         selected_option = st.radio(
-            f"¿'{symptom}' no es un síntoma registrado, te referías a...?",
+            f"¿{symptom}' no es un síntoma registrado, te referías a...?",
             options + ["Ninguna de las anteriores"],
             index=0,
             key=f"radio_{symptom}"
@@ -207,18 +176,23 @@ if st.session_state.get("pending_corrections", {}):
         st.session_state["symptoms_corrected"][symptom] = selected_option if selected_option != "Ninguna de las anteriores" else symptom
 
     if st.button("Confirmar selección"):
-        st.session_state["pending_corrections"] = {}  
+        st.session_state["pending_corrections"] = {} 
         corrected_symptoms = list(st.session_state["symptoms_corrected"].values())
+        st.markdown(f"sintomas corregidos {corrected_symptoms}")
         st.session_state["disease_predictions"] = predict_diseases(corrected_symptoms)
-        st.rerun()
+        #st.rerun()
 
 # Si no hay correcciones pendientes, analizar directamente
 elif st.button("Analizar síntomas", key="predict_button"):
+    symptoms_sugeridos = []
     symptoms = [s.strip() for s in symptoms_input.split(",") if s.strip()]
-    sugerir_sintomas(symptoms, st.session_state["X"].columns)
+    st.markdown(f"antes de sugerir: {symptoms}")
+
+    symptoms_sugeridos = sugerir_sintomas(symptoms, st.session_state["X"].columns)
+    st.markdown(f"dsp de sugerir: {symptoms_sugeridos}")
 
     if not st.session_state["pending_corrections"]:
-        st.session_state["disease_predictions"] = predict_diseases(symptoms)
+        st.session_state["disease_predictions"] = predict_diseases(symptoms_sugeridos)
         st.rerun()
 
 # Mostrar resultados si ya se generaron
