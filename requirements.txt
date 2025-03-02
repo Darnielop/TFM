@@ -4,6 +4,5 @@ tensorflow
 joblib
 pandas
 scikit-learn
-openai
-googletrans==4.0.0-rc1
 deep-translator
+openai
