@@ -170,6 +170,30 @@ a:hover {
     color: #0056b3 !important;
 }
 
+div[data-testid="stTextInput"] input {
+    caret-color: black !important;
+}
+
+/* Personalizar los tabs */
+div[data-testid="stTabs"] button {
+    background: none !important;  /* Eliminar el fondo */
+    border: none !important;  /* Eliminar el borde */
+    color: #004080 !important;  /* Azul oscuro */
+    font-size: 16px !important;  /* Tamaño de fuente */
+    font-weight: bold !important;
+    padding: 10px 15px !important;  /* Espaciado */
+    margin: 0 15px !important;  /* Espaciado entre tabs */
+    cursor: pointer !important;
+    transition: all 0.3s ease-in-out !important;
+    text-decoration: none !important; /* Eliminar cualquier subrayado */
+    position: relative !important;  /* Permitir efectos visuales */
+}
+
+/* Cambiar el fondo del elemento específico a azul */
+#root > div:first-child > div:first-child > div > div > section > div:first-child > div > div > div > div:nth-child(7) > div > div:first-child > div > div {
+    background-color: blue !important;
+}
+
 /* Estilos responsivos */
 @media (max-width: 768px) {
     body {
