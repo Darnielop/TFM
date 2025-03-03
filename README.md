@@ -85,6 +85,10 @@ Esto abrirá la interfaz en tu navegador.
    - Se mostrarán los tratamientos más comunes para cada enfermedad detectada.
 ![Recomendaciones de tratamiento](https://github.com/Darnielop/TFM/blob/main/imagen/imagen4.PNG)
 
+5️⃣ **Conclusión**  
+   - Se mostrara una conclusión sobre la enfermedad y sus tratamientos.
+![Recomendaciones de tratamiento](https://github.com/Darnielop/TFM/blob/main/imagen/imagen5.PNG)
+
 ---
 
 ## 💪 Tecnologías Utilizadas
