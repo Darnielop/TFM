@@ -83,7 +83,7 @@ Esto abrirá la interfaz en tu navegador.
      
 4️⃣ **Recomendaciones de tratamiento**  
    - Se mostrarán los tratamientos más comunes para cada enfermedad detectada.
-![Recomendaciones de tratamiento]([https://github.com/Darnielop/TFM/blob/main/imagen/imagen4.PNG)
+![Recomendaciones de tratamiento](https://github.com/Darnielop/TFM/blob/main/imagen/imagen4.PNG)
 
 ---
 
