@@ -3,7 +3,8 @@
 /* Estilos generales */
 html, body, [data-testid="stApp"] {
     font-family: 'Inter', sans-serif;
-    background-color: #f5f9fc !important;
+    background: rgb(164,203,239) !important;
+    background: linear-gradient(0deg, rgba(164,203,239,1) 0%, rgba(255,255,255,1) 100%) !important;
     color: #333 !important;
     margin: 0;
     padding: 0;
@@ -32,14 +33,6 @@ div[data-testid="stTextInput"] input {
     outline: none !important;
     transition: border-color 0.2s ease-in-out !important;
 }
-
-/* Ajustar el ancho del contenido en Streamlit */
-div[data-testid="stAppViewContainer"] {
-    max-width: 100% !important;  /* Ancho del contenido central */
-    margin-left: 15% !important;  /* Margen izquierdo */
-    margin-right: 15% !important;  /* Margen derecho */
-}
-
 
 /* Asegurar que el borde siga azul cuando se haga clic (focus) */
 div[data-testid="stTextInput"] input:focus {
@@ -101,6 +94,7 @@ input:focus {
 /* Encabezados */
 h1, h2, h3, h4, h5, h6 {
     color: #004e89 !important;
+    text-align: center !important;
 }
 
 /* Botones */
@@ -200,6 +194,26 @@ div[data-testid="stTabs"] button {
 /* Cambiar el fondo del elemento específico a azul */
 #root > div:first-child > div:first-child > div > div > section > div:first-child > div > div > div > div:nth-child(7) > div > div:first-child > div > div {
     background-color: blue !important;
+}
+
+/* Ajustar el ancho del contenido en Streamlit */
+div[data-testid="stAppViewContainer"] {
+    max-width: 100% !important;  /* Ancho del contenido central */
+    margin-left: 15% !important;  /* Margen izquierdo */
+    margin-right: 15% !important;  /* Margen derecho */
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    background-color: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 20px !important;
+    -webkit-box-shadow: 0px 0px 13px 5px rgba(0,0,0,0.25);
+    -moz-box-shadow: 0px 0px 13px 5px rgba(0,0,0,0.25);
+    box-shadow: 0px 0px 13px 5px rgba(0,0,0,0.25);
+}
+
+#root > div:first-child > div:first-child > div > div > section > div:first-child > div > div > div > div:nth-child(2) > div > div > div:nth-child(2) > div > img {
+    height: 200px !important;
 }
 
 /* Estilos responsivos */
