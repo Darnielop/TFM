@@ -6,3 +6,4 @@ pandas
 scikit-learn
 deep-translator
 openai
+python-dotenv
