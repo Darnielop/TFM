@@ -10,7 +10,8 @@ import re
 
 st.set_page_config(
     page_title="Diagnosis",
-    page_icon="styles/logo-removebg.png"
+    page_icon="styles/logo-removebg.png",
+    layout="wide"  # Hace que la página use todo el ancho disponible
 )
 
 # Configuración de la API de OpenAI
