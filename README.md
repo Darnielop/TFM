@@ -69,15 +69,21 @@ Esto abrirá la interfaz en tu navegador.
 1️⃣ **Ingresar síntomas**  
    - Escribe los síntomas separados por comas.  
    - El sistema corregirá errores de escritura o sugerirá términos más adecuados.
+  ![Ingresar síntomas](./imagen/imagen1.png)
+
 
 2️⃣ **Predicción de enfermedades**  
    - El modelo de IA analizará los síntomas y mostrará las enfermedades más probables con sus porcentajes de confianza.
+  ![Ingresar síntomas](./imagen/imagen2.png)
 
-3️⃣ **Recomendaciones de tratamiento**  
-   - Se mostrarán los tratamientos más comunes para cada enfermedad detectada.
-
-4️⃣ **Explicación con ChatGPT**  
+3️⃣ **Explicación con ChatGPT**  
    - Un chatbot médico explicará los tratamientos y detalles adicionales sobre la enfermedad.
+  ![Explicación con ChatGPT](./imagen/imagen3.png)
+
+     
+4️⃣ **Recomendaciones de tratamiento**  
+   - Se mostrarán los tratamientos más comunes para cada enfermedad detectada.
+  ![Recomendaciones de tratamiento](./imagen/imagen4.png)
 
 ---
 
@@ -96,4 +102,8 @@ Esto abrirá la interfaz en tu navegador.
 
 - **No sustituye a una consulta médica**: Este asistente es solo una herramienta de referencia.
 - **Se recomienda validar los resultados con un profesional de la salud**.
+
+## Enlace al video explicativo
+[Ver video en YouTube](https://youtu.be/hqtpbRkKN68)
+
 
