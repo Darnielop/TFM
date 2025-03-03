@@ -74,16 +74,16 @@ Esto abrirá la interfaz en tu navegador.
 
 2️⃣ **Predicción de enfermedades**  
    - El modelo de IA analizará los síntomas y mostrará las enfermedades más probables con sus porcentajes de confianza.
-![Ingresar síntomas]([./imagen/imagen2.png](https://github.com/Darnielop/TFM/blob/main/imagen/imagen2.PNG))
+![Ingresar síntomas](https://github.com/Darnielop/TFM/blob/main/imagen/imagen2.PNG)
 
 3️⃣ **Explicación con ChatGPT**  
    - Un chatbot médico explicará los tratamientos y detalles adicionales sobre la enfermedad.
-![Explicación con ChatGPT]([./imagen/imagen3.png](https://github.com/Darnielop/TFM/blob/main/imagen/imagen3.PNG))
+![Explicación con ChatGPT](https://github.com/Darnielop/TFM/blob/main/imagen/imagen3.PNG)
 
      
 4️⃣ **Recomendaciones de tratamiento**  
    - Se mostrarán los tratamientos más comunes para cada enfermedad detectada.
-![Recomendaciones de tratamiento]([./imagen/imagen4.png](https://github.com/Darnielop/TFM/blob/main/imagen/imagen4.PNG))
+![Recomendaciones de tratamiento]([https://github.com/Darnielop/TFM/blob/main/imagen/imagen4.PNG)
 
 ---
 
