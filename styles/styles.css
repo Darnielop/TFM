@@ -33,6 +33,14 @@ div[data-testid="stTextInput"] input {
     transition: border-color 0.2s ease-in-out !important;
 }
 
+/* Ajustar el ancho del contenido en Streamlit */
+div[data-testid="stAppViewContainer"] {
+    max-width: 100% !important;  /* Ancho del contenido central */
+    margin-left: 15% !important;  /* Margen izquierdo */
+    margin-right: 15% !important;  /* Margen derecho */
+}
+
+
 /* Asegurar que el borde siga azul cuando se haga clic (focus) */
 div[data-testid="stTextInput"] input:focus {
     border-color: #007bff !important; /* Azul */
