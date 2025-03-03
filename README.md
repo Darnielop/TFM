@@ -45,10 +45,10 @@ pip install -r requirements.txt
 
 ### 3️⃣ Configurar la API de OpenAI
 
-Edita el archivo **`streamlit_app.py`** y agrega tu clave de API en la variable `OPENAI_API_KEY`:
+Edita el archivo **`streamlit_app.py`** y agrega tu clave de API en la variable `OPENAI_API_KEY`, o crea un fichero .env donde almacenar tu API:
 
 ```python
-OPENAI_API_KEY = "tu_clave_aqui"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai.api_key = OPENAI_API_KEY
 ```
 
