@@ -69,7 +69,7 @@ Esto abrirá la interfaz en tu navegador.
 1️⃣ **Ingresar síntomas**  
    - Escribe los síntomas separados por comas.  
    - El sistema corregirá errores de escritura o sugerirá términos más adecuados.
-![Ingresar síntomas](./imagen/imagen1.png)
+![Ingresar síntomas](https://github.com/Darnielop/TFM/blob/main/imagen/imagen1.PNG)
 
 
 2️⃣ **Predicción de enfermedades**  
