@@ -110,4 +110,6 @@ Esto abrirá la interfaz en tu navegador.
 ## Enlace al video explicativo
 [Ver video en YouTube](https://youtu.be/hqtpbRkKN68)
 
+## Enlace al PDF
+[Power Point formato PDF](https://drive.google.com/file/d/1kChjKob9bpxNyYWYSSvF1HAc_rqBreSQ/view?usp=drive_link)
 
