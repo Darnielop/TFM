@@ -12,6 +12,7 @@ st.set_page_config(
     page_title="Diagnosis",
     page_icon="styles/logo-removebg.png",
     layout="wide"  # Hace que la página use todo el ancho disponible
+
 )
 
 # Configuración de la API de OpenAI
@@ -174,6 +175,14 @@ def chat_with_gpt(disease_predictions):
             return f"Error en la consulta: {str(e)}"
 
 # Interfaz de usuario
+if "first_run" not in st.session_state:
+    st.session_state.first_run = True
+else:
+    st.session_state.first_run = False 
+
+if st.session_state.first_run:
+    st.rerun()
+st.image("styles/medico.png", use_container_width=True)
 titulo_placeholder = st.empty()  # Espacio reservado para el título
 titulo_placeholder.title("Asistente Médico Virtual")
 mensaje_placeholder = st.empty()  # Espacio reservado para evitar duplicación
