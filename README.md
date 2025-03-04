@@ -113,3 +113,6 @@ Esto abrirá la interfaz en tu navegador.
 ## Enlace al PDF
 [Power Point formato PDF](https://drive.google.com/file/d/1kChjKob9bpxNyYWYSSvF1HAc_rqBreSQ/view?usp=drive_link)
 
+## Enlace a la aplicación
+[Enlace al Streamlit](http://diagnosis.myddns.me/)
+
