@@ -176,6 +176,14 @@ def chat_with_gpt(disease_predictions):
             return response.choices[0].message.content
         except Exception as e:
             return f"Error en la consulta: {str(e)}"
+if "first_run" not in st.session_state:
+    st.session_state.first_run = True
+else:
+    st.session_state.first_run = False 
+
+if st.session_state.first_run:
+    st.rerun()
+st.image("styles/medico.png", use_container_width=True)
 
 # Interfaz de usuario
 titulo_placeholder = st.empty()  # Espacio reservado para el título
